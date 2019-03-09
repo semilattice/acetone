@@ -71,10 +71,12 @@ anf = do
     binding <- local
     keyword "="
     expression <- action
+    keyword ";"
     pure (binding, expression)
 
   keyword "yield"
   result <- value
+  keyword ";"
 
   keyword "}"
 
