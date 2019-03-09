@@ -32,6 +32,7 @@ module Acetone.Ir
 
 import Prelude hiding (init)
 
+import Acetone.Ir.Intrinsic (Intrinsic, genIntrinsic)
 import Control.Applicative (liftA2)
 import Control.Lens (Plated (..), Traversal', (&), (^.), (.~), _2, at)
 import Data.Map (Map)
@@ -76,8 +77,8 @@ data Anf = Anf [(Local, Action)] Value
 -- |
 -- Expression that computes a value based on values.
 data Action
-  = CallAction Value Value
-  | ClosureAction Local Anf
+  = ClosureAction Local Anf
+  | IntrinsicAction (Intrinsic Value)
   deriving stock (Eq, Show)
 
 -- |
@@ -94,8 +95,8 @@ instance Plated Anf where
     Anf <$> traverse (traverse (go k)) actions <*> pure result
     where
     go :: Traversal' Action Anf
-    go _ (CallAction a b) = CallAction <$> pure a <*> pure b
     go l (ClosureAction a b) = ClosureAction <$> pure a <*> l b
+    go _ (IntrinsicAction a) = IntrinsicAction <$> pure a
 
 --------------------------------------------------------------------------------
 -- Free locals
@@ -116,8 +117,8 @@ instance HasFree Anf where
       foldr step init actions
 
 instance HasFree Action where
-  free (CallAction a b) = free a <> free b
   free (ClosureAction a b) = free b & at a .~ Nothing
+  free (IntrinsicAction a) = foldMap free a
 
 instance HasFree Value where
   free (GlobalValue _) = []
@@ -172,8 +173,8 @@ genAnf = Anf <$> Gen.listOf (liftA2 (,) genLocal (genHalf genAction))
 
 genAction :: Gen Action
 genAction = Gen.oneof
-  [ CallAction <$> genValue <*> genValue
-  , ClosureAction <$> genLocal <*> genHalf genAnf ]
+  [ ClosureAction <$> genLocal <*> genHalf genAnf
+  , IntrinsicAction <$> genIntrinsic genValue ]
 
 genValue :: Gen Value
 genValue = Gen.oneof

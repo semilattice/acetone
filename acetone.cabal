@@ -17,6 +17,7 @@ library
 
   exposed-modules:
     Acetone.Ir,
+    Acetone.Ir.Intrinsic,
     Acetone.Ir.Parse,
     Acetone.Main.Compile,
     Acetone.Main.Test,

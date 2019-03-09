@@ -1,0 +1,40 @@
+define @0 {
+    %0 = closure %2 {
+        %1 = closure %3 {
+            %4 = intAdd i32 %2 %3
+            yield %4
+        }
+        yield %1
+    }
+    yield %0
+}
+
+define @1 {
+    %0 = closure %2 {
+        %1 = closure %3 {
+            %4 = intMul i32 %2 %3
+            yield %4
+        }
+        yield %1
+    }
+    yield %0
+}
+
+define @2 {
+    %0 = closure %3 {
+        %1 = closure %4 {
+            %2 = closure %5 {
+                %6 = call @0 %3
+                %7 = call %6 %4
+
+                %8 = call @1 %7
+                %9 = call %8 %5
+
+                yield %9
+            }
+            yield %2
+        }
+        yield %1
+    }
+    yield %0
+}

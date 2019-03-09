@@ -1,3 +1,4 @@
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Acetone.Ir.Parse
@@ -12,9 +13,14 @@ module Acetone.Ir.Parse
   , anf
   , action
   , value
+
+    -- * Intrinsics
+  , intrinsic
+  , intSize
   ) where
 
 import Acetone.Ir
+import Acetone.Ir.Intrinsic
 
 import Control.Applicative ((<|>), many)
 import Data.Attoparsec.ByteString (Parser)
@@ -75,13 +81,8 @@ anf = do
   pure (Anf actions result)
 
 action :: Parser Action
-action = callAction <|> closureAction
+action = closureAction <|> intrinsicAction
   where
-  callAction    = do
-    keyword "call"
-    callee <- value
-    argument <- value
-    pure (CallAction callee argument)
 
   closureAction = do
     keyword "closure"
@@ -89,11 +90,36 @@ action = callAction <|> closureAction
     body <- anf
     pure (ClosureAction parameter body)
 
+  intrinsicAction =
+    IntrinsicAction <$> intrinsic value
+
 value :: Parser Value
 value = globalValue <|> localValue
   where
   globalValue = GlobalValue <$> global
   localValue  = LocalValue <$> local
+
+--------------------------------------------------------------------------------
+-- Intrinsics
+
+intrinsic :: Parser a -> Parser (Intrinsic a)
+intrinsic p = call# <|> panic# <|> intAdd# <|> intMul#
+  where
+
+  call# = do { keyword "call"; Call# <$> p <*> p }
+
+  panic# = do { keyword "panic"; Panic# <$> p }
+
+  intAdd# = do { keyword "intAdd"; IntAdd# <$> intSize <*> p <*> p }
+  intMul# = do { keyword "intMul"; IntMul# <$> intSize <*> p <*> p }
+
+intSize :: Parser IntSize
+intSize = i8 <|> i16 <|> i32 <|> i64
+  where
+  i8  = I8  <$ keyword "i8"
+  i16 = I16 <$ keyword "i16"
+  i32 = I32 <$ keyword "i32"
+  i64 = I64 <$ keyword "i64"
 
 --------------------------------------------------------------------------------
 -- Miscellaneous
