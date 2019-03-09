@@ -103,10 +103,11 @@ value = globalValue <|> localValue
 -- Intrinsics
 
 intrinsic :: Parser a -> Parser (Intrinsic a)
-intrinsic p = call# <|> panic# <|> intAdd# <|> intMul#
+intrinsic p = call# <|> lazy# <|> panic# <|> intAdd# <|> intMul#
   where
 
   call# = do { keyword "call"; Call# <$> p <*> many p }
+  lazy# = do { keyword "lazy"; Lazy# <$> p }
 
   panic# = do { keyword "panic"; Panic# <$> p }
 

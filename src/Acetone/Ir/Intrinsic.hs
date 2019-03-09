@@ -26,6 +26,7 @@ import qualified Test.QuickCheck.Gen as Gen
 data Intrinsic a
 
   = Call# a [a]
+  | Lazy# a
 
   | Panic# a
 
@@ -46,6 +47,7 @@ data IntSize = I8 | I16 | I32 | I64
 genIntrinsic :: Gen a -> Gen (Intrinsic a)
 genIntrinsic g = Gen.oneof
   [ Call# <$> g <*> Gen.listOf g
+  , Lazy# <$> g
 
   , Panic# <$> g
 
