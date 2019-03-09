@@ -1,0 +1,54 @@
+build-type: Simple
+cabal-version: >= 1.8
+
+name: acetone
+version: 0.0.0.0
+
+library
+  build-depends:
+    base,
+    containers,
+    hspec,
+    lens,
+    parallel,
+    QuickCheck
+
+  exposed-modules:
+    Acetone.Ir,
+    Acetone.Ir.Parse,
+    Acetone.Main.Test,
+    Acetone.Optimize.Dse,
+    Acetone.Optimize.DseSpec
+
+  ghc-options:
+    -Wall
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+
+  hs-source-dirs:
+    src
+
+executable acetone-compile
+  build-depends:
+    acetone,
+    base
+
+  hs-source-dirs:
+    boot
+
+  main-is:
+    acetone-compile.hs
+
+test-suite acetone-test
+  build-depends:
+    acetone,
+    base
+
+  hs-source-dirs:
+    boot
+
+  main-is:
+    acetone-test.hs
+
+  type:
+    exitcode-stdio-1.0
