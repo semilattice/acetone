@@ -86,9 +86,9 @@ action = closureAction <|> intrinsicAction
 
   closureAction = do
     keyword "closure"
-    parameter <- local
+    parameters <- many local
     body <- anf
-    pure (ClosureAction parameter body)
+    pure (ClosureAction parameters body)
 
   intrinsicAction =
     IntrinsicAction <$> intrinsic value
@@ -106,7 +106,7 @@ intrinsic :: Parser a -> Parser (Intrinsic a)
 intrinsic p = call# <|> panic# <|> intAdd# <|> intMul#
   where
 
-  call# = do { keyword "call"; Call# <$> p <*> p }
+  call# = do { keyword "call"; Call# <$> p <*> many p }
 
   panic# = do { keyword "panic"; Panic# <$> p }
 

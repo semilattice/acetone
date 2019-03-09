@@ -34,11 +34,13 @@ import Prelude hiding (init)
 
 import Acetone.Ir.Intrinsic (Intrinsic, genIntrinsic)
 import Control.Applicative (liftA2)
-import Control.Lens (Plated (..), Traversal', (&), (^.), (.~), _2, at)
+import Control.Lens -- (Plated (..), Traversal', (&), (^.), (.~), _2, at)
 import Data.Map (Map)
-import Data.Set (Set)
+import Data.Set (Set, (\\))
 import Data.Word (Word64)
 import Test.QuickCheck.Gen (Gen)
+
+import qualified Data.Set as Set
 
 import qualified Test.QuickCheck.Arbitrary as Gen
 import qualified Test.QuickCheck.Gen as Gen
@@ -77,7 +79,7 @@ data Anf = Anf [(Local, Action)] Value
 -- |
 -- Expression that computes a value based on values.
 data Action
-  = ClosureAction Local Anf
+  = ClosureAction [Local] Anf
   | IntrinsicAction (Intrinsic Value)
   deriving stock (Eq, Show)
 
@@ -117,7 +119,7 @@ instance HasFree Anf where
       foldr step init actions
 
 instance HasFree Action where
-  free (ClosureAction a b) = free b & at a .~ Nothing
+  free (ClosureAction a b) = free b \\ Set.fromList a
   free (IntrinsicAction a) = foldMap free a
 
 instance HasFree Value where
@@ -173,7 +175,7 @@ genAnf = Anf <$> Gen.listOf (liftA2 (,) genLocal (genHalf genAction))
 
 genAction :: Gen Action
 genAction = Gen.oneof
-  [ ClosureAction <$> genLocal <*> genHalf genAnf
+  [ ClosureAction <$> Gen.listOf genLocal <*> genHalf genAnf
   , IntrinsicAction <$> genIntrinsic genValue ]
 
 genValue :: Gen Value
