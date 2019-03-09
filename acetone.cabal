@@ -6,7 +6,9 @@ version: 0.0.0.0
 
 library
   build-depends:
+    attoparsec,
     base,
+    bytestring,
     containers,
     hspec,
     lens,
@@ -16,6 +18,7 @@ library
   exposed-modules:
     Acetone.Ir,
     Acetone.Ir.Parse,
+    Acetone.Main.Compile,
     Acetone.Main.Test,
     Acetone.Optimize.Dse,
     Acetone.Optimize.DseSpec

@@ -1,4 +1,5 @@
-{mkDerivation, base, containers, hspec, lens, parallel, QuickCheck}:
+{ mkDerivation, attoparsec, base, bytestring, containers, hspec, lens, parallel
+, QuickCheck }:
 mkDerivation {
     pname = "acetone";
     version = "0.0.0.0";
@@ -8,7 +9,9 @@ mkDerivation {
                                        p != toString ./.git)
                                 ./.;
     buildDepends = [
+        attoparsec
         base
+        bytestring
         containers
         hspec
         lens
