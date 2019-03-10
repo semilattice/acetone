@@ -35,11 +35,13 @@ import Prelude hiding (init)
 import Acetone.Ir.Intrinsic (Intrinsic, genIntrinsic)
 import Control.Applicative (liftA2)
 import Control.Lens -- (Plated (..), Traversal', (&), (^.), (.~), _2, at)
+import Data.ByteString (ByteString)
 import Data.Map (Map)
 import Data.Set (Set, (\\))
 import Data.Word (Word64)
 import Test.QuickCheck.Gen (Gen)
 
+import qualified Data.ByteString as ByteString
 import qualified Data.Set as Set
 
 import qualified Test.QuickCheck.Arbitrary as Gen
@@ -51,7 +53,7 @@ import qualified Test.QuickCheck.Gen as Gen
 -- |
 -- Name of a globally defined value.
 newtype Global =
-  Global Word64
+  Global ByteString
   deriving stock (Eq, Ord, Show)
 
 -- |
@@ -164,7 +166,7 @@ filterAccumRActionsWithFree p z (Anf actions result) =
 -- Generators
 
 genGlobal :: Gen Global
-genGlobal = Global <$> Gen.arbitrary
+genGlobal = Global . ByteString.pack <$> Gen.arbitrary
 
 genLocal :: Gen Local
 genLocal = Local <$> Gen.arbitrary

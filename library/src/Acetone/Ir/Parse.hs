@@ -22,7 +22,7 @@ module Acetone.Ir.Parse
 import Acetone.Ir
 import Acetone.Ir.Intrinsic
 
-import Control.Applicative ((<|>), many)
+import Control.Applicative ((<|>), liftA2, many)
 import Data.Attoparsec.ByteString (Parser)
 import Data.ByteString (ByteString)
 import Data.Functor (void)
@@ -39,7 +39,7 @@ import qualified Data.Map as Map
 global :: Parser Global
 global = token $ do
   _ <- P8.char '@'
-  n <- P8.takeWhile1 P8.isDigit >>= readResult
+  n <- P8.takeWhile1 (liftA2 (||) P8.isAlpha_ascii P8.isDigit)
   pure (Global n)
 
 local :: Parser Local

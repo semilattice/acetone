@@ -1,4 +1,4 @@
-define @0 {
+define @add {
     %0 = closure %2 {
         %1 = closure %3 {
             %4 = intAdd i32 %2 %3;
@@ -9,7 +9,7 @@ define @0 {
     yield %0;
 }
 
-define @1 {
+define @mul {
     %0 = closure %2 {
         %1 = closure %3 {
             %4 = intMul i32 %2 %3;
@@ -24,10 +24,10 @@ define @2 {
     %0 = closure %3 {
         %1 = closure %4 {
             %2 = closure %5 {
-                %6 = call @0 %3;
+                %6 = call @add %3;
                 %7 = call %6 %4;
 
-                %8 = call @1 %7;
+                %8 = call @mul %7;
                 %9 = call %8 %5;
 
                 yield %9;

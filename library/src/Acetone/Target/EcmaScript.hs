@@ -51,7 +51,7 @@ type M = (,) Builder
 -- |
 -- Translate a global to an ECMAScript identifier.
 fromGlobal :: Global -> M ()
-fromGlobal (Global g) = ("AG" <> BB.string7 (show g), ())
+fromGlobal (Global g) = ("AG" <> BB.byteString g, ())
 
 -- |
 -- Translate a local to an ECMAScript identifier.
@@ -65,8 +65,7 @@ fromLocal (Local l) = ("AL" <> BB.string7 (show l), ())
 -- Translate a unit to an ECMAScript statement.
 fromUnit :: Unit -> Builder
 fromUnit unit = fst $ do
-  -- TODO: How do we expose things? Preferably by name. Should we change
-  -- TODO: Global? How do we deal with exposing globals?
+  -- TODO: How do we expose things? Preferably by name.
 
   tell "(function() {\n"
   tell "\"use strict\";\n"
