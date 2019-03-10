@@ -189,6 +189,22 @@ fromIntrinsic k local (IntMul# I32 left right) = do
   k right
   tell ");\n"
 
+fromIntrinsic k local (EffectPure# value) = do
+  tell "var "
+  fromLocal local
+  tell " = AReffectPure("
+  k value
+  tell ");\n"
+
+fromIntrinsic k local (EffectBind# action kleisli) = do
+  tell "var "
+  fromLocal local
+  tell " = AReffectBind("
+  k action
+  tell ", "
+  k kleisli
+  tell ");\n"
+
 --------------------------------------------------------------------------------
 -- Miscellaneous
 

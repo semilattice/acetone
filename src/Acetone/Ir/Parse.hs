@@ -105,7 +105,9 @@ value = globalValue <|> localValue
 -- Intrinsics
 
 intrinsic :: Parser a -> Parser (Intrinsic a)
-intrinsic p = call# <|> lazy# <|> panic# <|> intAdd# <|> intMul#
+intrinsic p =
+  call# <|> lazy# <|> panic# <|> intAdd# <|> intMul# <|> effectPure# <|>
+  effectBind#
   where
 
   call# = do { keyword "call"; Call# <$> p <*> many p }
@@ -115,6 +117,9 @@ intrinsic p = call# <|> lazy# <|> panic# <|> intAdd# <|> intMul#
 
   intAdd# = do { keyword "intAdd"; IntAdd# <$> intSize <*> p <*> p }
   intMul# = do { keyword "intMul"; IntMul# <$> intSize <*> p <*> p }
+
+  effectPure# = do { keyword "effectPure"; EffectPure# <$> p }
+  effectBind# = do { keyword "effectBind"; EffectBind# <$> p <*> p }
 
 intSize :: Parser IntSize
 intSize = i8 <|> i16 <|> i32 <|> i64

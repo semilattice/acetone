@@ -33,6 +33,9 @@ data Intrinsic a
   | IntAdd# IntSize a a
   | IntMul# IntSize a a
 
+  | EffectPure# a
+  | EffectBind# a a
+
   deriving stock (Eq, Foldable, Functor, Show, Traversable)
 
 --------------------------------------------------------------------------------
@@ -52,7 +55,10 @@ genIntrinsic g = Gen.oneof
   , Panic# <$> g
 
   , IntAdd# <$> genIntSize <*> g <*> g
-  , IntMul# <$> genIntSize <*> g <*> g ]
+  , IntMul# <$> genIntSize <*> g <*> g
+
+  , EffectPure# <$> g
+  , EffectBind# <$> g <*> g ]
 
 genIntSize :: Gen IntSize
 genIntSize = Gen.oneof (fmap pure [minBound .. maxBound])
