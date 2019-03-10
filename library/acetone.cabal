@@ -13,10 +13,12 @@ library
     hspec,
     lens,
     parallel,
-    QuickCheck
+    QuickCheck,
+    transformers
 
   exposed-modules:
     Acetone.Ir,
+    Acetone.Ir.Generate,
     Acetone.Ir.Intrinsic,
     Acetone.Ir.Parse,
     Acetone.Main.Compile,

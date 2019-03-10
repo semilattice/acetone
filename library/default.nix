@@ -1,5 +1,5 @@
 { mkDerivation, attoparsec, base, bytestring, containers, hspec, lens, parallel
-, QuickCheck }:
+, QuickCheck, transformers }:
 mkDerivation {
     pname = "acetone";
     version = "0.0.0.0";
@@ -17,5 +17,6 @@ mkDerivation {
         lens
         parallel
         QuickCheck
+        transformers
     ];
 }
