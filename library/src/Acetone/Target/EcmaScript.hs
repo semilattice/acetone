@@ -2,12 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 -- |
--- ECMAScript target for Acetone. For generated names, the following prefixes
--- are used:
---
---  [AG] Globals.
---  [AL] Locals.
---  [AR] Runtime support.
+-- ECMAScript target for Acetone.
 module Acetone.Target.EcmaScript
   ( -- * Infrastructure
     M
@@ -51,7 +46,7 @@ type M = (,) Builder
 -- |
 -- Translate a global to an ECMAScript identifier.
 fromGlobal :: Global -> M ()
-fromGlobal (Global g) = ("AG" <> BB.byteString g, ())
+fromGlobal (Global g) = ("AG." <> BB.byteString g, ())
 
 -- |
 -- Translate a local to an ECMAScript identifier.
@@ -62,16 +57,14 @@ fromLocal (Local l) = ("AL" <> BB.string7 (show l), ())
 -- Units
 
 -- |
--- Translate a unit to an ECMAScript statement.
+-- Translate a unit to an ECMAScript expression.
 fromUnit :: Unit -> Builder
 fromUnit unit = fst $ do
-  -- TODO: How do we expose things? Preferably by name.
-
+  tell "// Begin of Acetone-generated code.\n"
   tell "(function() {\n"
   tell "\"use strict\";\n"
 
   ifor_ unit $ \global body -> do
-    tell "var "
     fromGlobal global
     tell " = (function() {\n"
 
@@ -83,6 +76,7 @@ fromUnit unit = fst $ do
     tell "})();\n"
 
   tell "})();\n"
+  tell "// End of Acetone-generated code.\n"
 
 --------------------------------------------------------------------------------
 -- Expressions
@@ -155,18 +149,18 @@ fromIntrinsic local (Call# callee arguments) = do
 fromIntrinsic local (Lazy# thunk) = do
   tell "var "
   fromLocal local
-  tell " = ARlazy("
+  tell " = AR.lazy("
   thunk
   tell ");\n"
 
 fromIntrinsic local (Panic# message) = do
-  -- While the ARpanic function never returns, we nonetheless declare a
+  -- While the AR.panic function never returns, we nonetheless declare a
   -- variable for its result, in the hope that the ECMAScript compiler will
   -- generate faster code because the variable is local when read.
   tell "var "
   fromLocal local
   tell ";\n"
-  tell "ARpanic("
+  tell "AR.panic("
   message
   tell ");\n"
 
@@ -191,14 +185,14 @@ fromIntrinsic local (IntMul# I32 left right) = do
 fromIntrinsic local (EffectPure# value) = do
   tell "var "
   fromLocal local
-  tell " = AReffectPure("
+  tell " = AR.effectPure("
   value
   tell ");\n"
 
 fromIntrinsic local (EffectBind# action kleisli) = do
   tell "var "
   fromLocal local
-  tell " = AReffectBind("
+  tell " = AR.effectBind("
   action
   tell ", "
   kleisli

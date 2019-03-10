@@ -1,9 +1,11 @@
-"use strict";
+(function() {
+    "use strict";
 
-function ARlazy(f) {
-    return function() {
-        var x = f();
-        f = function() { return x; };
-        return x;
+    AR.lazy = function(f) {
+        return function() {
+            var x = f();
+            f = function() { return x; };
+            return x;
+        };
     };
-}
+})();

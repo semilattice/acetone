@@ -1,5 +1,7 @@
-"use strict";
+(function() {
+    "use strict";
 
-function ARpanic(m) {
-    throw Error("ARpanic: " + m);
-}
+    AR.panic = function(m) {
+        throw Error(m);
+    };
+})();

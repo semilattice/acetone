@@ -1,0 +1,13 @@
+Usage
+
+First build the runtime with the following command. This will put the runtime
+in result/share/lib/runtime.js. To use it, put it in front of the Acetone
+output once, no matter how many units you have.
+
+    nix-build -A runtime.ecmascript
+
+Internals
+
+AL is the prefix for locals.
+AG is the name of the object in which globals are stored.
+AR is the name of the object in which runtime functions are stored.

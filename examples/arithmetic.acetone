@@ -20,7 +20,7 @@ define @mul {
     yield %0;
 }
 
-define @2 {
+define @addmul {
     %0 = closure %3 {
         %1 = closure %4 {
             %2 = closure %5 {
