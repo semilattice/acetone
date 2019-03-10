@@ -1,10 +1,12 @@
 Usage
 
-First build the runtime with the following command. This will put the runtime
-in result/share/lib/runtime.js. To use it, put it in front of the Acetone
-output once, no matter how many units you have.
+Build the runtime with the following command:
 
     nix-build -A runtime.ecmascript
+
+Now you can invoke the linker with the output of Acetone, like so:
+
+    result/bin/link unit1.js unit2.js unit3.js ...
 
 Internals
 
