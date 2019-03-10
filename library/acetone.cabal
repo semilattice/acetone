@@ -25,7 +25,8 @@ library
     Acetone.Main.Test,
     Acetone.Optimize.Dse,
     Acetone.Optimize.DseSpec,
-    Acetone.Target.EcmaScript
+    Acetone.Target.EcmaScript,
+    Epoxy.Ast
 
   ghc-options:
     -Wall
