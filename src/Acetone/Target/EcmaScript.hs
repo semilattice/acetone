@@ -121,7 +121,7 @@ fromAction local (ClosureAction parameters body) = do
   tell "};\n"
 
 fromAction local (IntrinsicAction intrinsic) =
-  fromIntrinsic fromValue local intrinsic
+  fromIntrinsic local (fromValue <$> intrinsic)
 
 -- |
 -- Translate a value to an ECMAScript expression.
@@ -135,32 +135,32 @@ fromValue (LocalValue g) = fromLocal g
 -- |
 -- Translate an intrinsic to series of ECMAScript statements. The result of the
 -- intrinsic is assigned to the given local.
-fromIntrinsic :: (a -> M ()) -> Local -> Intrinsic a -> M ()
+fromIntrinsic :: Local -> Intrinsic (M ()) -> M ()
 
-fromIntrinsic k local (Call# callee arguments) = do
+fromIntrinsic local (Call# callee arguments) = do
   tell "var "
   fromLocal local
   tell " = "
 
-  k callee
+  callee
 
   tell "("
 
   ifor_ arguments $ \i argument -> do
     when (i /= 0) $
       tell ", "
-    k argument
+    argument
 
   tell ");\n"
 
-fromIntrinsic k local (Lazy# thunk) = do
+fromIntrinsic local (Lazy# thunk) = do
   tell "var "
   fromLocal local
   tell " = ARlazy("
-  k thunk
+  thunk
   tell ");\n"
 
-fromIntrinsic k local (Panic# message) = do
+fromIntrinsic local (Panic# message) = do
   -- While the ARpanic function never returns, we nonetheless declare a
   -- variable for its result, in the hope that the ECMAScript compiler will
   -- generate faster code because the variable is local when read.
@@ -168,41 +168,41 @@ fromIntrinsic k local (Panic# message) = do
   fromLocal local
   tell ";\n"
   tell "ARpanic("
-  k message
+  message
   tell ");\n"
 
-fromIntrinsic k local (IntAdd# I32 left right) = do
+fromIntrinsic local (IntAdd# I32 left right) = do
   tell "var "
   fromLocal local
   tell " = "
-  k left
+  left
   tell " + "
-  k right
+  right
   tell " | 0;\n"
 
-fromIntrinsic k local (IntMul# I32 left right) = do
+fromIntrinsic local (IntMul# I32 left right) = do
   tell "var "
   fromLocal local
   tell " = Math.imul("
-  k left
+  left
   tell ", "
-  k right
+  right
   tell ");\n"
 
-fromIntrinsic k local (EffectPure# value) = do
+fromIntrinsic local (EffectPure# value) = do
   tell "var "
   fromLocal local
   tell " = AReffectPure("
-  k value
+  value
   tell ");\n"
 
-fromIntrinsic k local (EffectBind# action kleisli) = do
+fromIntrinsic local (EffectBind# action kleisli) = do
   tell "var "
   fromLocal local
   tell " = AReffectBind("
-  k action
+  action
   tell ", "
-  k kleisli
+  kleisli
   tell ");\n"
 
 --------------------------------------------------------------------------------
