@@ -1,0 +1,29 @@
+Acetone is a library for optimizing programs and translating them into other
+programming languages. In a compilation pipeline it fulfills a similar purpose
+as LLVM, but rather for high-level target languages which feature garbage
+collection. In addition, the internal representation used by Acetone is pure;
+there are no side-effects.
+
+Acetone is in early development. If you have any questions you may ask the
+author.
+
+Supported target languages:
+
+ - ECMAScript.
+
+Principles:
+
+ - Mutable globals, including globals that refer to environment facilities, are
+   bad. They are not supported. So: you cannot have a mutable global variable,
+   and things like stdout or the file system are not global either, but rather
+   passed around as arguments. This allows the caller to decide what will be
+   used, rather than the callee. Despite people telling each other not to use
+   mutable globals for decades, everybody is still doing it. I do not know why
+   and this seems to be the only way to stop that.
+
+ - There is no foreign function interface. Instead, the caller may pass around
+   such facilities. This prevents people from introducing globals.
+
+ - Exceptions cannot be caught. There is one non-total intrinsic, panic, which
+   will immediately abort the calling process. There is no way to recover. Use
+   sum types to report errors.
