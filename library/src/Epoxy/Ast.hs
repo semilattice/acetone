@@ -1,4 +1,6 @@
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module Epoxy.Ast
   ( -- * Names
@@ -18,8 +20,13 @@ module Epoxy.Ast
     -- * Types
   , Scheme (..)
   , Type (..)
+
+    -- * Constants
+  , pattern FunctionType
+  , pattern (:->:)
   ) where
 
+import Control.Lens (Plated (..))
 import Data.ByteString (ByteString)
 import Data.Word (Word64)
 
@@ -75,3 +82,15 @@ data Type
   | VariableType Identifier
   | ApplicationType Type Type
   deriving stock (Eq, Show)
+
+pattern FunctionType :: Type
+pattern FunctionType = VariableType (Identifier "Function")
+
+pattern (:->:) :: Type -> Type -> Type
+pattern (:->:) a b = ApplicationType (ApplicationType FunctionType a) b
+
+instance Plated Type where
+  plate _ (UnknownType a) = UnknownType <$> pure a
+  plate _ (SkolemType a) = SkolemType <$> pure a
+  plate _ (VariableType a) = VariableType <$> pure a
+  plate k (ApplicationType a b) = ApplicationType <$> k a <*> k b
